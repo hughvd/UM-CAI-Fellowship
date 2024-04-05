@@ -38,11 +38,20 @@ class Recommender(object):
         )
 
     def recommend(self, query: str):
+        system_content = '''
+        You are a keyword extraction tool used by a College Course Recommendation System that searches through course descriptions to recommend classes to a student.
+        You will output a series of keywords in the specified format based on a students request to help the system filter the dataset to relevant courses. 
+        Example:
+        Student request: "I am a mathematics student interested in computer science theory. What are some courses I could take?"
+        Your output: "computer science, algorithms, theory, data structures, discrete mathematics, computation, computational complexity"
+        
+        '''
         gpt_response = self.client.chat.completions.create(
             model=os.environ['OPENAI_MODEL'],
             messages=[
-                {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": "What is 2 + 2?"}
+                {"role": "system", "content": system_content},
+                {"role": "user", "content": query}
             ],
             temperature=0,
             stop=None)
+        print(gpt_response.choices[0].message.content)
