@@ -17,6 +17,7 @@ class Recommender(object):
         """
         super().__init__()
         #
+        print('Initializing...')
         self.df = df
 
         #Sets the current working directory to be the same as the file.
@@ -38,6 +39,7 @@ class Recommender(object):
         )
 
     def recommend(self, query: str):
+        print('Recommending...')
         system_content = '''
         You are a keyword extraction tool used by a College Course Recommendation System that searches through course descriptions to recommend classes to a student.
         You will output a series of keywords in the specified format based on a students request to help the system filter the dataset to relevant courses. 
@@ -46,12 +48,119 @@ class Recommender(object):
         Your output: "computer science, algorithms, theory, data structures, discrete mathematics, computation, computational complexity"
         
         '''
-        gpt_response = self.client.chat.completions.create(
-            model=os.environ['OPENAI_MODEL'],
-            messages=[
+        messages = [
                 {"role": "system", "content": system_content},
                 {"role": "user", "content": query}
-            ],
+            ]
+        print('Initial filter')
+        gpt_response = self.client.chat.completions.create(
+            model=os.environ['OPENAI_MODEL'],
+            messages=messages,
             temperature=0,
             stop=None)
-        print(gpt_response.choices[0].message.content)
+        messages.append({"role": "system", "content": gpt_response.choices[0].message.content})
+        keywords = gpt_response.choices[0].message.content.split(',')
+        keywords = [word.strip().lower() for word in keywords]
+
+        print('Initial keywords:')
+        print(keywords)
+
+        filtered_df = self.df[self.df['description'].str.contains('|'.join(keywords), case=False, na=False)]
+        print(f"Initial size: {filtered_df.shape[0]}")
+
+        num_cycles = 0
+        print('Begin filter loop')
+        while filtered_df.shape[0] > 150 and num_cycles < 4:
+            print('Filtering...')
+            messages.append({"role": "user", "content": 'Return additional keywords not listed above to filter dataframe.'})
+            gpt_response = self.client.chat.completions.create(
+            model=os.environ['OPENAI_MODEL'],
+            messages=messages,
+            temperature=0,
+            stop=None)
+
+            new_keywords = gpt_response.choices[0].message.content
+
+            print(f'Keywords {0}:')
+            print(new_keywords)
+
+            messages.append({"role": "system", "content": new_keywords})
+            # Get keywords in usable form
+            new_keywords = new_keywords.split(',')
+            new_keywords = [word.strip().lower() for word in new_keywords]
+            ## Check that filtered df size is nonzero
+            filtered_df = filtered_df[filtered_df['description'].str.contains('|'.join(new_keywords), case=False, na=False)]
+            num_cycles += 1
+            print(f"Cycle {num_cycles}: {filtered_df.shape[0]}")
+        
+        print(f'Final df size: {filtered_df.shape[0]}')
+        ## Turn the remaining courses into one long string.
+        course_string = ''
+
+        for _, row in filtered_df.iterrows():
+            course_name = row['course']
+            description = row['description']
+            course_string += f"Course {course_name}: {description}\n"
+
+        system_rec_message = "You are the worlds most highly trained academic advisor, a student has come to you with the following request: \n"
+        system_rec_message = system_rec_message + query + '\n'
+        system_rec_message = system_rec_message + '''Recommend the best courses from the following list, 
+                                                    return your recommendations as a list of the courses and a short rationale:\n''' + course_string
+        recommendation = self.client.chat.completions.create(
+            model=os.environ['OPENAI_MODEL'],
+            messages=[
+                {'role': 'system', 'content': system_rec_message}
+                ],
+            temperature=0,
+            stop=None)
+
+
+        # course_string1 = ''
+        # course_string2 = ''
+        #cs1 = True
+        # for _, row in filtered_df.iterrows():
+        #     course_name = row['course']
+        #     description = row['description']
+        #     if cs1:
+        #         course_string1 += f"Course {course_name}: {description}\n"
+        #         cs1=False
+        #     else:
+        #         course_string2 += f"Course {course_name}: {description}\n"
+        #         cs1=True
+
+        # print('Courses 1:')
+        # print(course_string1)
+        # print('Courses 2:')
+        # print(course_string2)
+
+        ########### SPLIT #################
+        ## Get recommendation
+        # system_rec_message = "You are the worlds most highly trained academic advisor, a student has come to you with the following request: \n"
+        # system_rec_message = system_rec_message + query + '\n'
+        # system_rec_message = system_rec_message + "Recommend the best courses from the following list:\n" + course_string1
+        # print('Final recommendation 1')
+        # recommendation1 = self.client.chat.completions.create(
+        #     model=os.environ['OPENAI_MODEL'],
+        #     messages=[
+        #         {'role': 'system', 'content': system_rec_message}
+        #         ],
+        #     temperature=0,
+        #     stop=None)
+        
+        # system_rec_message = "You are the worlds most highly trained academic advisor, a student has come to you with the following request: \n"
+        # system_rec_message = system_rec_message + query + '\n'
+        # system_rec_message = system_rec_message + "Recommend the best courses from the following list:\n" + course_string2
+        # print('Final recommendation 2')
+        # recommendation2 = self.client.chat.completions.create(
+        #     model=os.environ['OPENAI_MODEL'],
+        #     messages=[
+        #         {'role': 'system', 'content': system_rec_message}
+        #         ],
+        #     temperature=0,
+        #     stop=None)
+        
+        print('Returning...')
+        print(recommendation.choices[0].message.content)
+        # print(recommendation1.choices[0].message.content)
+        # print(recommendation2.choices[0].message.content)
+        return recommendation.choices[0].message.content

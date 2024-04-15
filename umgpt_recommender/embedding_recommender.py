@@ -34,7 +34,7 @@ class EmbeddingRecommender(object):
             api_key=os.environ["OPENAI_API_KEY"],
         )
 
-    def _get_embedding(self, text, model="text-embedding-3-small"):
+    def _get_embedding(self, text, model="text-embedding-ada-002"):
         text = text.replace("\n", " ")
         return self.client.embeddings.create(input = [text], model=model).data[0].embedding
 

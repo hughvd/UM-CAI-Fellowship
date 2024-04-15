@@ -1,0 +1,13 @@
+# Ignore CSV files
+*.csv
+course_similarity/*.csv
+course_similarity/Data/*.csv
+
+# Ignore XLSX files
+*.xlsx
+course_similarity/*.xlsx
+course_similarity/Data/*.xlsx
+# Ignore PKL files
+*.pkl
+course_similarity/*.pkl
+course_similarity/Data/*.pkl
