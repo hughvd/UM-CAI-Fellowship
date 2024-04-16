@@ -2,6 +2,7 @@
 *.csv
 course_similarity/*.csv
 course_similarity/Data/*.csv
+course_similarity/Data/Viewpoint*.csv
 
 # Ignore XLSX files
 *.xlsx
