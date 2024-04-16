@@ -89,7 +89,9 @@ class Recommender(object):
             new_keywords = new_keywords.split(',')
             new_keywords = [word.strip().lower() for word in new_keywords]
             ## Check that filtered df size is nonzero
-            filtered_df = filtered_df[filtered_df['description'].str.contains('|'.join(new_keywords), case=False, na=False)]
+            test_df = filtered_df[filtered_df['description'].str.contains('|'.join(new_keywords), case=False, na=False)]
+            if len(test_df) > 15:
+                filtered_df = test_df
             num_cycles += 1
             print(f"Cycle {num_cycles}: {filtered_df.shape[0]}")
         
@@ -113,54 +115,7 @@ class Recommender(object):
                 ],
             temperature=0,
             stop=None)
-
-
-        # course_string1 = ''
-        # course_string2 = ''
-        #cs1 = True
-        # for _, row in filtered_df.iterrows():
-        #     course_name = row['course']
-        #     description = row['description']
-        #     if cs1:
-        #         course_string1 += f"Course {course_name}: {description}\n"
-        #         cs1=False
-        #     else:
-        #         course_string2 += f"Course {course_name}: {description}\n"
-        #         cs1=True
-
-        # print('Courses 1:')
-        # print(course_string1)
-        # print('Courses 2:')
-        # print(course_string2)
-
-        ########### SPLIT #################
-        ## Get recommendation
-        # system_rec_message = "You are the worlds most highly trained academic advisor, a student has come to you with the following request: \n"
-        # system_rec_message = system_rec_message + query + '\n'
-        # system_rec_message = system_rec_message + "Recommend the best courses from the following list:\n" + course_string1
-        # print('Final recommendation 1')
-        # recommendation1 = self.client.chat.completions.create(
-        #     model=os.environ['OPENAI_MODEL'],
-        #     messages=[
-        #         {'role': 'system', 'content': system_rec_message}
-        #         ],
-        #     temperature=0,
-        #     stop=None)
-        
-        # system_rec_message = "You are the worlds most highly trained academic advisor, a student has come to you with the following request: \n"
-        # system_rec_message = system_rec_message + query + '\n'
-        # system_rec_message = system_rec_message + "Recommend the best courses from the following list:\n" + course_string2
-        # print('Final recommendation 2')
-        # recommendation2 = self.client.chat.completions.create(
-        #     model=os.environ['OPENAI_MODEL'],
-        #     messages=[
-        #         {'role': 'system', 'content': system_rec_message}
-        #         ],
-        #     temperature=0,
-        #     stop=None)
         
         print('Returning...')
         print(recommendation.choices[0].message.content)
-        # print(recommendation1.choices[0].message.content)
-        # print(recommendation2.choices[0].message.content)
         return recommendation.choices[0].message.content

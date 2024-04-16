@@ -7,7 +7,12 @@ course_similarity/Data/*.csv
 *.xlsx
 course_similarity/*.xlsx
 course_similarity/Data/*.xlsx
+
 # Ignore PKL files
 *.pkl
 course_similarity/*.pkl
 course_similarity/Data/*.pkl
+
+# Ignore env files
+*.env
+umgpt_recommender/*.env
