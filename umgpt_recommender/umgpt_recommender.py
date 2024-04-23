@@ -119,3 +119,40 @@ class Recommender(object):
         print('Returning...')
         print(recommendation.choices[0].message.content)
         return recommendation.choices[0].message.content
+    
+
+
+class EmbeddingRecommender(object):
+    '''
+    
+    '''
+    def __init__(self, df: pd.DataFrame):
+        """Initialize course recommender to given Pandas dataframe. Dataframe must have 
+        columns labeled as ['course', 'description', 'embedding']. Loads OpenAI gpt and embedding model, must have .env file with 
+        'OPENAI_API_KEY' = your_api_key.
+        """
+        super().__init__()
+        #
+        print('Initializing...')
+        self.df = df
+
+        #Sets the current working directory to be the same as the file.
+        os.chdir(os.path.dirname(os.path.abspath('umgpt_recommender.py')))
+
+        #Load environment file for secrets.
+        try:
+            if load_dotenv('.env') is False:
+                raise TypeError
+        except TypeError:
+            print('Unable to load .env file.')
+            quit()
+        #Create Azure client
+        self.client = AzureOpenAI(
+            api_key=os.environ["OPENAI_API_KEY"],
+            api_version=os.environ['OPENAI_API_VERSION'],
+            azure_endpoint=os.environ['OPENAI_API_BASE'],
+            organization=os.environ['OPENAI_ORGANIZATION_ID']
+        )
+    
+    def generate_embedding():
+        """Generates embedding vectors for each course description in the dataframe."""
