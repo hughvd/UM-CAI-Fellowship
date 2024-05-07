@@ -12,6 +12,16 @@ The UMGPT Recommender is a Python-based course recommendation system housed in t
 - `embedding_recommender.py`: Additional details needed.
 
 ## Usage
+### Prerequisites
+The UMGPT Recommender assumes access to the UM GPT API hosted on Microsoft AZURE. A .env file is assumed to be correctly formatted like below:
+```
+OPENAI_API_KEY=key
+OPENAI_API_VERSION=2023-05-15
+OPENAI_API_BASE=https://api.umgpt.umich.edu/azure-openai-api
+OPENAI_ORGANIZATION_ID=id
+OPENAI_MODEL=gpt-4-32k
+OPENAI_EMBEDDING_MODEL=text-embedding-ada-002
+```
 
 ### Initializing the Recommender
 
