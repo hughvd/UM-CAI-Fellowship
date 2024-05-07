@@ -2,6 +2,7 @@ import pandas as pd
 from openai import AzureOpenAI
 import os
 from dotenv import load_dotenv
+from typing import List, Optional
 
 
 
@@ -38,7 +39,7 @@ class Recommender(object):
             organization=os.environ['OPENAI_ORGANIZATION_ID']
         )
 
-    def recommend(self, query: str):
+    def recommend(self, levels: Optional[List[int]] = None, query: str = ''):
         print('Recommending...')
         system_content = '''
         You are a keyword extraction tool used by a College Course Recommendation System that searches through course descriptions to recommend classes to a student.
@@ -65,7 +66,14 @@ class Recommender(object):
         print('Initial keywords:')
         print(keywords)
 
-        filtered_df = self.df[self.df['description'].str.contains('|'.join(keywords), case=False, na=False)]
+        if levels is None:
+            levels = []
+        
+        if levels:
+            filtered_df = self.df[self.df['level'].isin(levels)]
+            filtered_df = filtered_df[filtered_df['description'].str.contains('|'.join(keywords), case=False, na=False)]
+        else:
+            filtered_df = self.df[self.df['description'].str.contains('|'.join(keywords), case=False, na=False)]
         print(f"Initial size: {filtered_df.shape[0]}")
 
         num_cycles = 0
