@@ -22,7 +22,6 @@ import umgpt_recommender
 
 # Load your DataFrame here
 courses_df = pd.read_csv('path_to_your_courses.csv')
-
 recommender = umgpt_recommender.Recommender(courses_df)
 ```
 
@@ -30,6 +29,9 @@ recommender = umgpt_recommender.Recommender(courses_df)
 To get course recommendations based on a student's query:
 ```python
 query = "I want to learn about artificial intelligence, what are some courses that I could take?"
-recommended_courses = recommender.recommend(query)
+# Without filtering reccommendations by course level
+recommended_courses = recommender.recommend(query=query)
+# With filtering by course level
+recommended_courses = recommender.recommend(level=[100, 200], query=query)
 print(recommended_courses)
 ```
