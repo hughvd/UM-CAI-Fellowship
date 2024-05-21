@@ -132,7 +132,7 @@ class Recommender(object):
 
 class EmbeddingRecommender(object):
     '''
-    
+    This recommendder uses embedding to find courses most similar to a given students request.
     '''
     def __init__(self, df: pd.DataFrame):
         """Initialize course recommender to given Pandas dataframe. Dataframe must have 
