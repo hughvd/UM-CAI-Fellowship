@@ -76,37 +76,8 @@ class Recommender(object):
             filtered_df = self.df[self.df['description'].str.contains('|'.join(keywords), case=False, na=False)]
         print(f"Initial size: {filtered_df.shape[0]}")
 
-        num_cycles = 0
-        print('Begin filter loop')
-        while filtered_df.shape[0] > 150 and num_cycles < 4:
-            print('Filtering...')
-            messages.append({"role": "user", "content": 'Return additional keywords not listed above to filter dataframe.'})
-            gpt_response = self.client.chat.completions.create(
-            model=os.environ['OPENAI_MODEL'],
-            messages=messages,
-            temperature=0,
-            stop=None)
-
-            new_keywords = gpt_response.choices[0].message.content
-
-            print(f'Keywords {0}:')
-            print(new_keywords)
-
-            messages.append({"role": "system", "content": new_keywords})
-            # Get keywords in usable form
-            new_keywords = new_keywords.split(',')
-            new_keywords = [word.strip().lower() for word in new_keywords]
-            ## Check that filtered df size is nonzero
-            test_df = filtered_df[filtered_df['description'].str.contains('|'.join(new_keywords), case=False, na=False)]
-            if len(test_df) > 15:
-                filtered_df = test_df
-            num_cycles += 1
-            print(f"Cycle {num_cycles}: {filtered_df.shape[0]}")
-        
-        print(f'Final df size: {filtered_df.shape[0]}')
         ## Turn the remaining courses into one long string.
         course_string = ''
-
         for _, row in filtered_df.iterrows():
             course_name = row['course']
             description = row['description']
@@ -140,7 +111,6 @@ class EmbeddingRecommender(object):
         'OPENAI_API_KEY' = your_api_key.
         """
         super().__init__()
-        #
         print('Initializing...')
         self.df = df
 
@@ -161,6 +131,3 @@ class EmbeddingRecommender(object):
             azure_endpoint=os.environ['OPENAI_API_BASE'],
             organization=os.environ['OPENAI_ORGANIZATION_ID']
         )
-    
-    def generate_embedding():
-        """Generates embedding vectors for each course description in the dataframe."""
