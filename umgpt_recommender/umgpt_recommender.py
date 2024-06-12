@@ -26,7 +26,7 @@ class Recommender(object):
 
         #Load environment file for secrets.
         try:
-            if load_dotenv('.env') is False:
+            if load_dotenv(r'C:\Users\hvand\OneDrive - Umich\Documents\atlas\umgpt_recommender\.env') is False:
                 raise TypeError
         except TypeError:
             print('Unable to load .env file.')

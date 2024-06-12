@@ -24,9 +24,9 @@ class Recommender(object):
         #Sets the current working directory to be the same as the file.
         os.chdir(os.path.dirname(os.path.abspath('umgpt_recommender.py')))
 
-        #Load environment file for secrets.
+        #Load environment file for secrets, set to .env path.
         try:
-            if load_dotenv('.env') is False:
+            if load_dotenv(r'C:\Users\hvand\OneDrive - Umich\Documents\atlas\umgpt_recommender\.env') is False:
                 raise TypeError
         except TypeError:
             print('Unable to load .env file.')
