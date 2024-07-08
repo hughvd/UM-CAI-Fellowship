@@ -168,11 +168,17 @@ class EmbeddingRecommender(object):
     # Metadata filtering to allow for more precise filtering?
     def recommend(self, levels: Optional[List[int]] = None, query: str = ''):
         print('Recommending...')
+        #### Different prompts ####################
         system_content = '''
-        Return an example course description of a course that would be most applicable to the following students request.
-        Student request: 
+        You will be given a request from a student atuniversity to provide good course recommendations. You will return a
+        course description that would be most applicable to their request. In this course descriptions, provide a list of topics as well 
+        as a general description of the course. Limit the general description to around 500 words.
         '''
-        system_content = system_content + query
+        
+        # system_content = '''
+        # Return an example course description of a course that would be most applicable to the following students request.
+        # Student request: 
+        # '''
         messages = [
                 {"role": "system", "content": system_content},
                 {"role": "user", "content": query}
@@ -184,6 +190,7 @@ class EmbeddingRecommender(object):
             temperature=0,
             stop=None).choices[0].message.content
         print(gpt_response)
+
         if levels is None:
             levels = []
         
@@ -191,29 +198,22 @@ class EmbeddingRecommender(object):
             filtered_df = self.df[self.df['level'].isin(levels)]
         else:
             filtered_df = self.df
-        print(f"Initial size: {filtered_df.shape[0]}")
-        ## Turn the remaining courses into one long string.
 
         ex_embedding = self.client.embeddings.create(
             input = [gpt_response], 
             model=os.environ['OPENAI_EMBEDDING_MODEL']).data[0].embedding
         
-        # Get the top 100 similar courses.
-        # Loop through dataframe and keeping a stack of top 100 similar courses
-        # research running average algorithms
+        # Get the top 100 similar courses 
         heap = []
         for idx, row in filtered_df.iterrows():
-            # Get cosine similarity of i-th course description and example course.
             similarity = cosine_similarity(ex_embedding, row['embedding'])
             if idx < 100:
                 heapq.heappush(heap, (similarity, idx))
             else:
                 heapq.heappushpop(heap, (similarity, idx))
         
-        # Extract indexes
+        # Extract indexes and filter
         indexes = [idx for sim, idx in heap]
-
-        # If you want the actual vectors or rows, you can use:
         filtered_df = filtered_df.iloc[indexes]
         
         course_string = ''
@@ -221,9 +221,9 @@ class EmbeddingRecommender(object):
         for _, row in filtered_df.iterrows():
             course_name = row['course']
             description = row['description']
-            course_string += f"Course {course_name}: {description}\n"
+            course_string += f"{course_name}: {description}\n"
 
-        system_rec_message = "You are the worlds most highly trained academic advisor, a student has come to you with the following request: \n"
+        system_rec_message = "You are the worlds most highly trained academic advisor, a student has come to you with the following profile: \n"
         system_rec_message = system_rec_message + query + '\n'
         system_rec_message = system_rec_message + '''Recommend the best courses from the following list, 
                                                     return your recommendations as a list of the courses and a short rationale:\n''' + course_string
