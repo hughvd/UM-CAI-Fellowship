@@ -161,6 +161,7 @@ class EmbeddingRecommender(object):
             azure_endpoint=os.environ['OPENAI_API_BASE'],
             organization=os.environ['OPENAI_ORGANIZATION_ID']
         )
+        print('Success')
     # Notes on optimizing:
     # Currently using the pandas array to access each embedding vector, to compute most similar courses 
     # by saving it as a matrix and getting row index of highest similarity would be more efficient.
@@ -195,7 +196,8 @@ class EmbeddingRecommender(object):
             levels = []
         
         if levels:
-            filtered_df = self.df[self.df['level'].isin(levels)]
+            # Make sure to reset indices for search later
+            filtered_df = self.df[self.df['level'].isin(levels)].reset_index(drop=True)
         else:
             filtered_df = self.df
 
