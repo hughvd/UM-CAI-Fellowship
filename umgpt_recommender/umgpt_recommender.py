@@ -5,6 +5,7 @@ import os
 from dotenv import load_dotenv
 from typing import List, Optional
 import heapq
+import time
 
 
 
@@ -167,14 +168,14 @@ class EmbeddingRecommender(object):
     # by saving it as a matrix and getting row index of highest similarity would be more efficient.
     # TODO:
     # Metadata filtering to allow for more precise filtering?
-    def recommend(self, levels: Optional[List[int]] = None, query: str = ''):
+    def recommend(self, levels: Optional[List[int]] = None, query: str = '', debug: bool = False):
         print('Recommending...')
         #### Different prompts ####################
         system_content = '''
-        You will be given a request from a student atuniversity to provide good course recommendations. You will return a
-        course description that would be most applicable to their request. In this course descriptions, provide a list of topics as well 
-        as a general description of the course. Limit the general description to around 500 words.
-        '''
+You will be given a request from a student at The University of Michigan to provide good course recommendations. \
+You will return a course description that would be most applicable to their request. In this course descriptions, \
+provide a list of topics as well as a general description of the course. Limit the general description to around \
+500 words.'''
         
         # system_content = '''
         # Return an example course description of a course that would be most applicable to the following students request.
@@ -184,14 +185,21 @@ class EmbeddingRecommender(object):
                 {"role": "system", "content": system_content},
                 {"role": "user", "content": query}
             ]
-        print('Example description')
+        if debug:
+            print('Example description')
+        # Generate example description based off queuery.
+        tic = time.perf_counter()
         gpt_response = self.client.chat.completions.create(
             model=os.environ['OPENAI_MODEL'],
             messages=messages,
             temperature=0,
             stop=None).choices[0].message.content
-        print(gpt_response)
+        toc = time.perf_counter()
+        timeExDesc = toc - tic
+        if debug:
+            print(gpt_response)
 
+        # Filter dataframe by course levels
         if levels is None:
             levels = []
         
@@ -200,12 +208,16 @@ class EmbeddingRecommender(object):
             filtered_df = self.df[self.df['level'].isin(levels)].reset_index(drop=True)
         else:
             filtered_df = self.df
-
+        # Generate the embedding for example course description
+        tic = time.perf_counter()
         ex_embedding = self.client.embeddings.create(
             input = [gpt_response], 
             model=os.environ['OPENAI_EMBEDDING_MODEL']).data[0].embedding
-        
+        toc = time.perf_counter()
+        timeEmb = toc - tic
+
         # Get the top 100 similar courses 
+        tic = time.perf_counter()
         heap = []
         for idx, row in filtered_df.iterrows():
             similarity = cosine_similarity(ex_embedding, row['embedding'])
@@ -213,22 +225,45 @@ class EmbeddingRecommender(object):
                 heapq.heappush(heap, (similarity, idx))
             else:
                 heapq.heappushpop(heap, (similarity, idx))
-        
+        toc = time.perf_counter()
+        timeGenHeap = toc - tic
         # Extract indexes and filter
         indexes = [idx for sim, idx in heap]
         filtered_df = filtered_df.iloc[indexes]
         
+        # Prepare the courses to be passed into LLM
         course_string = ''
-
         for _, row in filtered_df.iterrows():
             course_name = row['course']
             description = row['description']
             course_string += f"{course_name}: {description}\n"
 
-        system_rec_message = "You are the worlds most highly trained academic advisor, a student has come to you with the following profile: \n"
-        system_rec_message = system_rec_message + query + '\n'
-        system_rec_message = system_rec_message + '''Recommend the best courses from the following list, 
-                                                    return your recommendations as a list of the courses and a short rationale:\n''' + course_string
+        # system_rec_message = "You are the worlds most highly trained academic advisor, a student has come to you with the following profile: \n"
+        # system_rec_message = system_rec_message + query + '\n'
+        # system_rec_message = system_rec_message + '''Recommend the best courses from the following list, 
+        #                                             return your recommendations as a list of the courses and a short rationale:\n''' + course_string
+        
+        system_rec_message = f"""You are the world's most highly trained academic advisor, with decades of experience \
+in guiding students towards their optimal academic paths. Your task is to provide personalized course recommendations \
+based on the following student profile:
+Student Profile:
+{query}
+
+Instructions:
+1. Analyze the student's profile carefully, considering their interests, academic background, and career goals.
+2. Review the list of available courses provided below.
+3. Recommend the top 5-10 most suitable courses for this student.
+4. For each recommended course, provide a brief but compelling rationale (2-3 sentences) explaining why it's a good fit.
+5. Format your response as a numbered list, with each item containing the course name followed by your rationale.
+
+Available Courses:
+{course_string}
+
+Remember: Your recommendations should be tailored to the student's unique profile and aspirations. Aim to balance academic growth, career preparation,\
+and personal interest in your selections."""
+        
+        # Recommend
+        tic = time.perf_counter()
         recommendation = self.client.chat.completions.create(
             model=os.environ['OPENAI_MODEL'],
             messages=[
@@ -236,7 +271,14 @@ class EmbeddingRecommender(object):
                 ],
             temperature=0,
             stop=None)
-        
+        toc = time.perf_counter()
+        timeRec = toc - tic
+        if debug:
+            print('Runtime Info: ')
+            print(f'Time to generate example description: {timeExDesc:.2f}')
+            print(f'Time to generate embedding: {timeEmb:.2f}')
+            print(f'Time to generate heap: {timeGenHeap:.2f}')
+            print(f'Time to generate recommendation: {timeRec:.2f}')
         print('Returning...')
         return recommendation.choices[0].message.content
 
