@@ -3,3 +3,5 @@
 *.xlsx
 *.pkl
 umgpt_recommender/.env
+EmbRecommenderDiagram.drawio
+KeywordRecommenderDiagram.drawio
