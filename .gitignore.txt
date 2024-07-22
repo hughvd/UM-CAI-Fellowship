@@ -17,3 +17,7 @@ course_similarity/Data/*.pkl
 # Ignore env files
 *.env
 umgpt_recommender/*.env
+
+# Diagram files
+EmbRecommenderDiagram.drawio
+KeywordRecommenderDiagram.drawio
