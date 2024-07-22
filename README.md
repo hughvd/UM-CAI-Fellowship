@@ -7,7 +7,7 @@ The script contains two classes, a Recommender and EmbeddingRecommender class.
 
 ## Contents
 - `Recommender`: Initializes with a DataFrame containing course names and descriptions, uses GPT-4 to iteratively filter and recommend courses.
-  -  It does this  by iteratively filtering the data frame by querying the gpt4 API to return relevant keywords and does this iteratively until there are less than 500 courses in the filtered_df. Then, it queries gpt4 with the student's query and the list of filtered courses and asks it to recommend the best courses in list format. 
+  -  It does this  by iteratively filtering the data frame by querying the gpt4 API to return relevant keywords and does this until there are less than 500 courses in the filtered_df. Then, it queries gpt4 with the student's query and the list of filtered courses and asks it to recommend the best courses in list format. 
 
 <p align="center">
   <img src="KeywordRecommenderDiagram.png" alt="Keyword Recommender Process">
