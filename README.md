@@ -1,8 +1,8 @@
 # UMGPT Recommender
 
 ## Overview
-The UMGPT Recommender is a Python-based course recommendation system housed in the `umgpt_recommender` folder. This system leverages the power of GPT-4 to recommend educational courses tailored to students' queries. The main script is: `umgpt_recommender.py` - A course recommender system that filters and recommends courses based on student requests.
-The script contains two classes, a Recommender and EmbeddingRecommender class.
+The UMGPT Recommender is a Python-based course recommendation system housed in the `recommender` folder. This system leverages the power of GPT-4 to recommend educational courses tailored to students' queries. The main script is: `umgptRecommender.py` - A course recommender system that filters and recommends courses based on student requests.
+The script contains two classes, a KeywordRecommender and EmbeddingRecommender class.
 
 
 ## Contents
@@ -37,11 +37,11 @@ OPENAI_EMBEDDING_MODEL=text-embedding-ada-002
 Before using the `recommend()` function, initialize the recommender by loading your course DataFrame with columns "course" and "description":
 
 ```python
-import umgpt_recommender
+import umgptRecommender
 
 # Load your DataFrame here
 courses_df = pd.read_csv('path_to_your_courses.csv')
-recommender = umgpt_recommender.Recommender(courses_df)
+recommender = umgptRecommender.EmbeddingRecommender(courses_df)
 ```
 
 ### Getting Recommendations
