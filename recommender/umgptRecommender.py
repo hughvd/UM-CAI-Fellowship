@@ -174,7 +174,7 @@ class EmbeddingRecommender(object):
         system_content = '''
 You will be given a request from a student at The University of Michigan to provide good course recommendations. \
 You will return a course description that would be most applicable to their request. In this course descriptions, \
-provide a list of topics as well as a general description of the course. Limit the general description to around \
+provide a list of topics as well as a general description of the course. Limit the  description to be less than \
 500 words.'''
         
         # system_content = '''
