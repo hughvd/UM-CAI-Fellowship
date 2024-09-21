@@ -17,7 +17,7 @@ The script contains two classes, a KeywordRecommender and EmbeddingRecommender c
   -  It does this by using gpt4 to return as example course description for a course related to the student's query. It then produces an embedding of this descrption and finds the top 100 courses in terms of cosine similarity. Then, it queries gpt4 with the student's query and the list of courses and asks it to recommend the best courses in list format. 
 
 <p align="center">
-  <img src="EmbRecommenderDiagram.png" alt="Embedding Recommender Process">
+  <img src="EmbRecommenderDiagram.png" alt="Embedding Recommender Process" width="500" height="auto">
 </p>
 
 ## Usage
