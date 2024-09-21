@@ -1,8 +1,7 @@
 # Ignore CSV files
 *.csv
-course_similarity/*.csv
-course_similarity/Data/*.csv
-course_similarity/Data/Viewpoint*.csv
+course_similarity/data/
+
 
 # Ignore XLSX files
 *.xlsx
