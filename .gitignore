@@ -2,7 +2,6 @@
 *.csv
 course_similarity/data/
 
-
 # Ignore XLSX files
 *.xlsx
 course_similarity/*.xlsx

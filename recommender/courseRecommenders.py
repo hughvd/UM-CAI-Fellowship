@@ -169,7 +169,7 @@ def cosine_similarity(vec1, vec2):
 
 ################################### NEW CLASS #####################################################
 class KeywordRecommender(object):
-    """Description
+    """This recommenders surfaces relevent courses through a keyword search.
     """
 
     def __init__(self, df: pd.DataFrame):
