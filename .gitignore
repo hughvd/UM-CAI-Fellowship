@@ -11,6 +11,7 @@ course_similarity/Data/*.xlsx
 *.pkl
 course_similarity/*.pkl
 course_similarity/Data/*.pkl
+recommender/atlas/
 
 # Ignore env files
 *.env
