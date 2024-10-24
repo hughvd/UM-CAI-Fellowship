@@ -14,8 +14,12 @@ course_similarity/Data/*.pkl
 recommender/atlas/
 
 # Ignore env files
-*.env
-umgpt_recommender/*.env
+**/.env
+
+# Pycache
+**/__pycache__/
+*.pyc
+
 
 # Diagram files
 EmbRecommenderDiagram.drawio
