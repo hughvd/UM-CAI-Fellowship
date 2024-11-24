@@ -48,10 +48,9 @@ class EmbeddingRecommender(object):
         print('Recommending...')
         #### Different prompts ####################
         system_content = '''
-You will be given a request from a student at The University of Michigan to provide good course recommendations. \
-You will return a course description that would be most applicable to their request. In this course descriptions, \
-provide a list of topics as well as a general description of the course. Limit the  description to be less than \
-500 words.'''
+You are a tool go generate potential course descriptions. You will be given a request from a student to provide good course recommendations. \
+You will return a course description that would be most applicable to their request, do not output any preamble. In this course description, \
+provide ONLY a list of topics as well as a general description of the course. Limit the  description to be less than 200 words.'''
         
         # system_content = '''
         # Return an example course description of a course that would be most applicable to the following students request.
@@ -66,7 +65,7 @@ provide a list of topics as well as a general description of the course. Limit t
         # Generate example description based off queuery.
         tic = time.perf_counter()
         gpt_response = self.client.chat.completions.create(
-            model=os.environ['OPENAI_MODEL'],
+            model=os.environ['GENERATOR_MODEL'],
             messages=messages,
             temperature=0,
             stop=None).choices[0].message.content
@@ -141,7 +140,7 @@ and personal interest in your selections."""
         # Recommend
         tic = time.perf_counter()
         recommendation = self.client.chat.completions.create(
-            model=os.environ['OPENAI_MODEL'],
+            model=os.environ['RECOMMENDER_MODEL'],
             messages=[
                 {'role': 'system', 'content': system_rec_message}
                 ],
