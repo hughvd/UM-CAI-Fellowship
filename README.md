@@ -14,11 +14,15 @@ The script contains two classes, a KeywordRecommender and EmbeddingRecommender c
 </p>
 
 - `EmbeddingRecommender`: Initializes with a DataFrame containing course names, descriptions, and embeddings of descriptions. Uses similarity in the embedding space to find courses to recommend from.
-  -  It does this by using gpt4 to return as example course description for a course related to the student's query. It then produces an embedding of this descrption and finds the top 100 courses in terms of cosine similarity. Then, it queries gpt4 with the student's query and the list of courses and asks it to recommend the best courses in list format. 
+  -  It does this by using gpt3-5 to return an example course description for a course related to the student's query. It then generates an embedding of this descrption and finds the top 50 courses in terms of cosine similarity. Then, it queries gpt4 with the student's query and the list of courses and asks it to recommend the best courses in list format. 
 
 <p align="center">
   <img src="EmbRecommenderDiagram.png" alt="Embedding Recommender Process" width="300" height="auto">
 </p>
+
+## Demo
+![Demo](demo.mp4)
+
 
 ## Usage
 ### Prerequisites

@@ -34,14 +34,17 @@ async def run_analysis(recommender, query: str, n_trials: int = 10, levels: List
         
         # Extract recommended courses and find their ranks
         recommended_courses = extract_course_numbers(recommendation)
+        ranks = []
         for course in recommended_courses:
             course_rank = sorted_df[sorted_df['course'] == course]['similarity_rank'].iloc[0]
             rank_counts[course_rank] += 1
+            ranks.append(course_rank)
         
         # Store full recommendation
         all_recommendations.append({
             'recommendation': recommendation,
-            'recommended_courses': recommended_courses
+            'recommended_courses': recommended_courses,
+            'ranks': ranks
         })
     
     # Plot the results
