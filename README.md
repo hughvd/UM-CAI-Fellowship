@@ -21,7 +21,7 @@ The script contains two classes, a KeywordRecommender and EmbeddingRecommender c
 </p>
 
 ## Demo
-![Demo](demo.mp4)
+![Demo](https://raw.githubusercontent.com/hughvd/UM-CAI-Fellowship/main/demo.mp4)
 
 
 ## Usage
