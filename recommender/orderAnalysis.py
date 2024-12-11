@@ -10,47 +10,8 @@ def extract_course_numbers(recommendation: str) -> List[str]:
     matches = re.findall(pattern, recommendation)
     return [match.strip() for match in matches]
 
-async def run_analysis(recommender, query: str, n_trials: int = 10, levels: List[int] = None) -> Dict:
-    """
-    Run multiple trials of course recommendations and analyze the similarity rankings.
-    
-    Args:
-        recommender: Initialized recommender model
-        query: Student query string
-        n_trials: Number of recommendation trials to run
-        levels: Optional list of course levels to filter by
-    
-    Returns:
-        Dictionary containing rank counts and all recommendations
-    """
-    rank_counts = defaultdict(int)
-    # {course: {rank: count}}
-    course_rank_counts = defaultdict(lambda: defaultdict(int)) 
-    all_recommendations = []
-    
-    for i in range(n_trials):
-        print(f"Running trial {i+1}/{n_trials}")
-        
-        # Get recommendation and sorted courses
-        recommendation, sorted_df = await recommender.recommend(query, levels)
-        
-        # Extract recommended courses and find their ranks
-        recommended_courses = extract_course_numbers(recommendation)
-        ranks = []
-        for course in recommended_courses:
-            course_rank = sorted_df[sorted_df['course'] == course]['similarity_rank'].iloc[0]
-            rank_counts[course_rank] += 1
-            course_rank_counts[course][course_rank] += 1
-            ranks.append(course_rank)
-        
-        # Store full recommendation
-        all_recommendations.append({
-            'recommendation': recommendation,
-            'recommended_courses': recommended_courses,
-            'ranks': ranks
-        })
-    
-    # Plot rank distribution and course rank distribution
+def plot_rank_and_course(rank_counts, course_rank_counts, query):
+    """Plot rank distribution and course rank distribution"""
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(15, 12))
 
     ranks = sorted(rank_counts.keys())
@@ -93,20 +54,55 @@ async def run_analysis(recommender, query: str, n_trials: int = 10, levels: List
     ax2.set_xticklabels(unique_courses, rotation=45, ha='right')
     ax2.grid(True, alpha=0.3)
 
-    plt.tight_layout()
-    plt.show()
+    return fig
 
-    # Print summary statistics
-    total_recommendations = sum(counts)
-    print(f"\nSummary Statistics:")
-    print(f"Total recommendations: {total_recommendations}")
-    print(f"Unique ranks recommended: {len(ranks)}")
-    print(f"Most frequently recommended rank: {max(rank_counts.items(), key=lambda x: x[1])[0]}")
-    print(f"Average rank: {sum(r * c for r, c in rank_counts.items()) / total_recommendations:.2f}")
+def plot_rank(ranks, counts, figsize, title):
+    # Plot 1: Rank Distribution
+    plt.figure(figsize=figsize)
+    plt.bar(ranks, counts)
+    plt.title(title)
+    plt.xlabel('Similarity Rank (0 = Most Similar)')
+    plt.ylabel('Number of Times Recommended')
+    plt.grid(True, alpha=0.3)
+
+    return plt.gcf()
+
+async def run_analysis(recommender, query: str, n_trials: int = 10, levels: List[int] = None) -> Dict:
+    """
+    Run multiple trials of course recommendations and analyze the similarity rankings.
+    
+    Args:
+        recommender: Initialized recommender model
+        query: Student query string
+        n_trials: Number of recommendation trials to run
+        levels: Optional list of course levels to filter by
+    
+    Returns:
+        Dictionary containing rank counts and all recommendations
+    """
+    rank_counts = defaultdict(int)
+    # {course: {rank: count}}
+    course_rank_counts = defaultdict(lambda: defaultdict(int))
+    
+    for i in range(n_trials):
+        print(f"Running trial {i+1}/{n_trials}")
+        
+        # Get recommendation and sorted courses
+        recommendation, sorted_df = await recommender.recommend(query, levels)
+        
+        # Extract recommended courses and find their ranks
+        recommended_courses = extract_course_numbers(recommendation)
+        ranks = []
+        for course in recommended_courses:
+            course_rank = sorted_df[sorted_df['course'] == course]['similarity_rank'].iloc[0]
+            rank_counts[course_rank] += 1
+            course_rank_counts[course][course_rank] += 1
+            ranks.append(course_rank)
+    
+    fig = plot_rank_and_course(rank_counts=rank_counts, course_rank_counts=course_rank_counts, query=query)
     
     return {
-        'rank_counts': dict(rank_counts),
-        'course_rank_counts': dict(course_rank_counts),
-        'all_recommendations': all_recommendations,
+        'rank_counts': rank_counts,
+        'course_rank_counts': course_rank_counts,
         'figure': fig
     }

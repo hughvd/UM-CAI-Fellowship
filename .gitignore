@@ -20,6 +20,9 @@ recommender/atlas/
 **/__pycache__/
 *.pyc
 
+# Figures
+figures/
+
 
 # Diagram files
 EmbRecommenderDiagram.drawio
