@@ -77,6 +77,7 @@ general description of the course. Limit the description to be less than 200 wor
 Student Request:
 {query}
 """
+        # Load input and get system prompt
         messages = [
             {"role": "system", "content": system_content},
             {"role": "user", "content": query}
