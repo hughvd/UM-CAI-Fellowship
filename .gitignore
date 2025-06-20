@@ -20,7 +20,7 @@ recommender/atlas/
 **/__pycache__/
 *.pyc
 atlasSite/
-
+venv/
 # Figures
 figures/
 
