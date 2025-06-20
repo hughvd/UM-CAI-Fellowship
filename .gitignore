@@ -19,6 +19,7 @@ recommender/atlas/
 # Pycache
 **/__pycache__/
 *.pyc
+atlasSite/
 
 # Figures
 figures/
