@@ -59,15 +59,18 @@ def plot_confidence_heatmap(
       - Wrapped prompt labels
       - Optional truncation to top-N courses
     """
-    # 1) Optionally keep only the top-N courses by avg confidence
+    # Optionally keep only the top-N courses by avg confidence
     if max_courses is not None and df.shape[1] > max_courses:
         top_cols = df.mean().nlargest(max_courses).index
         df = df[top_cols]
 
-    # 2) Wrap the prompt labels to a fixed width
+    # Remove all parentheses and their contents from each column name
+    df.columns = df.columns.str.replace(r"\s*\(.*?\)", "", regex=True)
+
+    # Wrap the prompt labels to a fixed width
     wrapped_prompts = ["\n".join(textwrap.wrap(p, width=30)) for p in df.index]
 
-    # 3) Create the figure with a more reasonable fixed size
+    # Create the figure with a more reasonable fixed size
     fig, ax = plt.subplots(
         figsize=(
             max(12, len(df.columns) * width_per_col),
@@ -75,7 +78,7 @@ def plot_confidence_heatmap(
         ),
         constrained_layout=True,
     )
-    im = ax.imshow(df.values, origin="lower", aspect="auto")
+    im = ax.imshow(df.values, origin="lower", aspect="auto", vmin=0, vmax=2)
 
     ax.set_xticks(range(len(df.columns)))
     ax.set_xticklabels(df.columns, rotation=45, ha="right", fontsize=8)
@@ -84,6 +87,6 @@ def plot_confidence_heatmap(
     ax.set_yticklabels(wrapped_prompts, fontsize=8)
 
     fig.colorbar(im, ax=ax, label="Avg Confidence (0–2)")
-    ax.set_title(f"Avg Confidence Heatmap for “{domain}”")
+    ax.set_title(f"Average Confidence Heatmap for “{domain}”")
 
     plt.show()
