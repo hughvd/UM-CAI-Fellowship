@@ -11,7 +11,7 @@ The core of the system is the `EmbeddingRecommender`, which uses course descript
 - Asking GPT-4 to select and explain the best matches from the filtered list.
 
 <p align="center">
-  <img src="EmbRecommenderDiagram.png" alt="Embedding Recommender Process" width="300" height="auto">
+  <img src="ExploreBlueFlowchart.jpg" alt="Embedding Recommender Process" width="auto" height="auto">
 </p>
 
 ## Demo
