@@ -1,7 +1,7 @@
 # ExploreBlue
 
 ## Overview
-The ExploreBlue is a Python-based course recommendation system designed to help students discover relevant courses based on their interests and academic goals. The main system is housed in the `recommender` folder and leverages GPT-4o and embedding-based similarity to provide high-quality, personalized recommendations.
+ExploreBlue is a Python-based course recommendation system designed to help students discover relevant courses based on their interests and academic goals. The main system is housed in the `recommender` folder and leverages GPT-4o and embedding-based similarity to provide high-quality, personalized recommendations.
 
 ## Architecture
 ExploreBlue uses course description embeddings to find and recommend courses most relevant to a student's query. The process involves:
