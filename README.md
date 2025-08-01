@@ -1,10 +1,10 @@
-# UMGPT Recommender
+# ExploreBlue
 
 ## Overview
-The UMGPT Recommender is a Python-based course recommendation system designed to help students discover relevant courses based on their interests and academic goals. The main system is housed in the `recommender` folder and leverages GPT-4 and embedding-based similarity to provide high-quality, personalized recommendations.
+The ExploreBlue is a Python-based course recommendation system designed to help students discover relevant courses based on their interests and academic goals. The main system is housed in the `recommender` folder and leverages GPT-4o and embedding-based similarity to provide high-quality, personalized recommendations.
 
-## Embedding Recommender
-The core of the system is the `EmbeddingRecommender`, which uses course description embeddings to find and recommend courses most relevant to a student's query. The process involves:
+## Architecture
+ExploreBlue uses course description embeddings to find and recommend courses most relevant to a student's query. The process involves:
 - Generating an example course description for the student's query using GPT-4.
 - Creating an embedding for this description.
 - Finding the most similar courses in the embedding space.
