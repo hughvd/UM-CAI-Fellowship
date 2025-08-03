@@ -102,6 +102,13 @@ async def run_analysis(
         # Get recommendation and sorted courses
         recommendation, sorted_df = await recommender.recommend(query, levels)
 
+        print(
+            f"Trial {i+1} rank {sorted_df.iloc[0]["similarity_rank"]}: {sorted_df.iloc[0]['course']}"
+        )
+        print(
+            f"Trial {i+1} rank {sorted_df.iloc[1]["similarity_rank"]}: {sorted_df.iloc[1]['course']}"
+        )
+
         # Extract recommended courses and find their ranks
         recommended_courses = extract_course_numbers(recommendation)
         ranks = []

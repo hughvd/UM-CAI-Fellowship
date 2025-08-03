@@ -240,9 +240,8 @@ CONSTRAINTS:
             )
 
             # Prepare the recommendation prompt
-            # NOTE: our dataframe does not have the course name as a data column
             system_rec_message = f"""You are an expert academic advisor specializing in personalized course recommendations. \
-When evaluating matches between student profiles and courses, prioritize direct relevance, prerequisite alignment, and career trajectory fit.
+When evaluating matches between student profiles and courses, prioritize direct relevance and career trajectory fit.
 
 Context: Student Profile ({query})
 Course Options: 
@@ -251,14 +250,16 @@ Course Options:
 REQUIREMENTS:
 - Return exactly 10 courses, ranked by relevance and fit
 - Recommend ONLY courses listed in Course Options
+- If a course is cross-listed, write the course number as "COURSEXXX (Cross-listed as COURSEYYY)"
 - For each recommendation include:
-  1. Course number
-  2. One-sentence explanation focused on student's specific profile/goals
+  1. Course number (include cross-listed courses)
+  2. Course name
+  2. Two-sentence explanation focused on student's specific profile/goals
   3. Confidence level (High/Medium/Low)
 
 FORMAT (Markdown):
-1. **COURSEXXX: Couse Name**
-Rationale: [One clear sentence explaining fit]
+1. **COURSEXXX: COURSE_TITLE**
+Rationale: [Two clear sentences explaining fit]
 Confidence: [Level]
 
 2. [Next course...]
@@ -268,26 +269,6 @@ CONSTRAINTS:
 - NO mentions of prerequisites unless explicitly stated in course description
 - NO suggestions outside provided course list
 - NO mention of being an AI or advisor"""
-
-            #             system_rec_message = f"""You are the world's most highly trained academic advisor, with decades of experience \
-            # in guiding students towards their optimal academic paths. Your task is to provide personalized course recommendations \
-            # based on the student's profile:
-
-            # Instructions:
-            # 1. Analyze the student's profile carefully, considering their interests, academic background, and career goals.
-            # 2. Review the list of available courses provided below.
-            # 3. Recommend the top 5-10 most suitable courses for this student.
-            # 4. For each recommended course, provide a brief but compelling rationale (2-3 sentences) explaining why it's a good fit.
-            # 5. Format your response as a numbered list, with each item containing the course name followed by your rationale.
-
-            # Student Profile:
-            # {query}
-
-            # Available Courses:
-            # {course_string}
-
-            # Remember: Your recommendations should be tailored to the student's unique profile and aspirations. Aim to balance academic growth, career preparation, \
-            # and personal interest in your selections. Do not recommend courses that are not under available courses."""
 
             messages = [{"role": "system", "content": system_rec_message}]
 
@@ -301,26 +282,3 @@ CONSTRAINTS:
             return recommendation
         except Exception as e:
             return f"Error: {str(e)}"
-
-
-# Usage example:
-# config = {
-#     "OPENAI_API_KEY": "your_api_key",
-#     "OPENAI_API_VERSION": "your_api_version",
-#     "OPENAI_API_BASE": "your_api_base",
-#     "OPENAI_ORGANIZATION_ID": "your_org_id",
-#     "GENERATOR_MODEL": "your_generator_model",
-#     "RECOMMENDER_MODEL": "your_recommender_model",
-#     "OPENAI_EMBEDDING_MODEL": "your_embedding_model"
-# }
-# openai_client = AsyncOpenAIClient(config)
-# similarity_calculator = CosineSimilarityCalculator()
-# recommender = EmbeddingRecommender(openai_client, similarity_calculator)
-# recommender.load_courses(courses_data)
-#
-# async def print_recommendation():
-#     async for token in recommender.stream_recommend("I'm interested in machine learning and data science."):
-#         print(token, end='', flush=True)
-#
-# import asyncio
-# asyncio.run(print_recommendation())
