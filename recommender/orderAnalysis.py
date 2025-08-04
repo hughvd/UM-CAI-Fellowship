@@ -4,10 +4,15 @@ import matplotlib.pyplot as plt
 from collections import defaultdict
 from typing import Dict, List
 
+from tqdm import tqdm
 
-def extract_course_numbers(recommendation: str) -> List[str]:
-    """Extract course numbers from recommendation text"""
-    pattern = r"\*\*([\w\s]+?\d{3})"
+
+def extract_course_numbers(recommendation: str) -> list:
+    """
+    Extract course numbers/names from LLM recommendations.
+    Finds everything between '**' and ':' on each line.
+    """
+    pattern = r"\*\*(.+?):"
     matches = re.findall(pattern, recommendation)
     return [match.strip() for match in matches]
 
@@ -96,26 +101,21 @@ async def run_analysis(
     # {course: {rank: count}}
     course_rank_counts = defaultdict(lambda: defaultdict(int))
 
-    for i in range(n_trials):
-        print(f"Running trial {i+1}/{n_trials}")
-
+    for i in tqdm(range(n_trials)):
         # Get recommendation and sorted courses
         recommendation, sorted_df = await recommender.recommend(query, levels)
-
-        print(
-            f"Trial {i+1} rank {sorted_df.iloc[0]["similarity_rank"]}: {sorted_df.iloc[0]['course']}"
-        )
-        print(
-            f"Trial {i+1} rank {sorted_df.iloc[1]["similarity_rank"]}: {sorted_df.iloc[1]['course']}"
-        )
 
         # Extract recommended courses and find their ranks
         recommended_courses = extract_course_numbers(recommendation)
         ranks = []
         for course in recommended_courses:
-            course_rank = sorted_df[sorted_df["course"] == course][
-                "similarity_rank"
-            ].iloc[0]
+            match = sorted_df[sorted_df["course"] == course]
+            if match.empty:
+                print(
+                    f"Warning: Course '{course}' not found in sorted_df for query '{query[:50]}...'"
+                )
+                continue
+            course_rank = match["similarity_rank"].iloc[0]
             rank_counts[course_rank] += 1
             course_rank_counts[course][course_rank] += 1
             ranks.append(course_rank)
