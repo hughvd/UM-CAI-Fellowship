@@ -67,6 +67,8 @@ def plot_rank_and_course(rank_counts, course_rank_counts, query):
     ax2.set_xticklabels(unique_courses, rotation=45, ha="right")
     ax2.grid(True, alpha=0.3)
 
+    plt.close(fig)
+
     return fig
 
 
