@@ -158,7 +158,7 @@ Student Request:
 
             # Prepare course string for the prompt
             course_string = "\n".join(
-                f"{row['course']}: {row['description']}"
+                f"{row['course']}: {row['title']}\n{row['description']}"
                 for _, row in filtered_df.iterrows()
             )
 

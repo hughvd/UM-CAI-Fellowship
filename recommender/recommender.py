@@ -200,9 +200,6 @@ CONSTRAINTS:
             except Exception as e:
                 yield f"Error generating recommendation: {str(e)}"
 
-            except Exception as e:
-                yield f"Error generating recommendation: {str(e)}"
-
         except Exception as e:
             yield f"Unexpected error: {str(e)}"
 
@@ -233,9 +230,8 @@ CONSTRAINTS:
             )
             filtered_df = filtered_df.iloc[similar_course_indices]
 
-            # Prepare course string for the prompt
             course_string = "\n".join(
-                f"{row['course']}: {row['description']}"
+                f"{row['course']}: {row['title']}\n{row['description']}"
                 for _, row in filtered_df.iterrows()
             )
 
